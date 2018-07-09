@@ -1,8 +1,8 @@
-#include "ofApp.h"
+#include "vjGokko.h"
 
 //#define NO_LOAD_XML
 //--------------------------------------------------------------
-void ofApp::setupOutput(){
+void vjGokko::setupOutput(){
     ofBackground(0);
     mainW = ofGetWidth();
     mainH = ofGetHeight();
@@ -21,51 +21,56 @@ void ofApp::setupOutput(){
     postGlitch.setup(&glitchFbo);
 
     //--- layerFbo ---//
-    initFbo(tempFbo);
-    initFbo(centerClipFbo);
+//    initFbo(tempFbo);
+//    initFbo(centerClipFbo);
+//        initFbo(lrClipFbo);
     initFbo(cRFbo);
     initFbo(flowerFbo);
-    initFbo(lrClipFbo);
+
 
     //--- layerSetup ---//
     centerClip.clipFolder = "anatomy";
     temp.setup(ofGetCenter());
+    centerClip.setup(true);
+    lrClip.setup(false);
     flower.setupFft(1024);
 }
 //--------------------------------------------------------------
-void ofApp::setup(){
+void vjGokko::setup(){
     ofSetFrameRate(0);
     ofSetVerticalSync(false);
     ofSetDataPathRoot("../Resources/data/");
 
     //--- init Images ---//
     ofDirectory dir;
-    for(auto &f:aIFolderNames){
-        if(dir.listDir("images/antique/"+ f)){
+    for(auto &fName:aIFolderNames){
+        if(dir.listDir("images/antique/"+ fName)){
             ofFbo fbo;
             ofImage img;
             for(int i=0; i<dir.size(); i++) {
                 if(img.load(dir.getPath(i))){
                     setImageFbo(fbo, img);
-                    if(f=="anatomy"){
-                        anatomyFbos.push_back(fbo);
-                    }else if(f=="lady"){
-                        ladyFbos.push_back(fbo);
-                    }else if(f=="flower"){
-                        flowerFbos.push_back(fbo);
-                    }else if(f=="butterfly"){
-                        butterflyFbos.push_back(fbo);
-                    }else if(f=="fig"){
-                        figFbos.push_back(fbo);
-                    }else if(f=="lFace"){
-                        lClipFbos.push_back(fbo);
-                    }else if(f=="rFace"){
-                        rClipFbos.push_back(fbo);
-                    }
+                    clips[fName].push_back(fbo);
+//                    if(f=="anatomy"){
+//                        anatomyFbos.push_back(fbo);
+//                    }else if(f=="lady"){
+//                        ladyFbos.push_back(fbo);
+//                    }else if(f=="flower"){
+//                        flowerFbos.push_back(fbo);
+//                    }else if(f=="butterfly"){
+//                        butterflyFbos.push_back(fbo);
+//                    }else if(f=="fig"){
+//                        figFbos.push_back(fbo);
+//                    }else if(f=="lFace"){
+//                        lrClip.lClipFbos.push_back(fbo);
+//                    }else if(f=="rFace"){
+//                        lrClip.rClipFbos.push_back(fbo);
+//                    }
                 }
             }
         }
     }
+    centerClip.setClip(clips[centerClip.clipFolder]);
 
     if(dir.listDir("images/rects")){
         ofImage img;
@@ -90,61 +95,70 @@ void ofApp::setup(){
 
 #ifndef NO_LOAD_XML
     MONITOR->loadSettings("settings/UI.xml");
-    tempUI->loadSettings("settings/templateUI.xml");
-    centerClipUI->loadSettings("settings/centerClipUI.xml");
+    //tempUI->loadSettings("settings/templateUI.xml");
+    temp.getUI()->loadSettings("settings/templateUI.xml");
+//    centerClipUI->loadSettings("settings/centerClipUI.xml");
+//    lrClipUI->loadSettings("settings/lrClipUI.xml");
+    centerClip.getUI()->loadSettings("settings/centerClipUI.xml");
+    lrClip.getUI()->loadSettings("settings/lrClipUI.xml");
+
     crossRectsUI->loadSettings("settings/crossRectsUI.xml");
     flowerUI->loadSettings("settings/flowerUI.xml");
-    lrClipUI->loadSettings("settings/lrClipUI.xml");
+
 #endif
     blendMode=1;
     cout<<" - loadedUIXmls - "<<endl;
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void vjGokko::update(){
     if(bRandomPS){
         if(ofGetFrameNum()%randomSpan == 0) blendMode>=24 ? blendMode= 0 : blendMode++;
     }
     blendLabel->setLabel(psBlend.getBlendMode(blendMode));
 
     //---------- UPDATE LAYERS ----------//
-    if(lsTemp.bUpdate){
-        tempFbo.begin();
-        ofClear(255);
-        temp.update();
-        ofSetColor(255,0,0);
-        temp.draw();
-        tempFbo.end();
-    }
-    if(lsCenterClip.bUpdate){
-        centerClipFbo.begin();
-        ofPushMatrix();
-        ofPushStyle();
-        ofClear(255);
-        ofTranslate(ofGetCenter());
-        ofSetColor(255);
-        if("anatomy"==centerClip.clipFolder) centerClip.drawRandom(anatomyFbos);
-        if("lady"==centerClip.clipFolder) centerClip.drawRandom(ladyFbos);
-        if("flower"==centerClip.clipFolder) centerClip.drawRandom(flowerFbos);
-        if("butterfly"==centerClip.clipFolder) centerClip.drawRandom(butterflyFbos);
-        if("fig"==centerClip.clipFolder) centerClip.drawRandom(figFbos);
-        ofPopStyle();
-        ofPopMatrix();
-        centerClipFbo.end();
-    }
-    if(lsLRClip.bUpdate){
-        lrClipFbo.begin();
-        ofPushMatrix();
-        ofPushStyle();
-        ofClear(255);
-        ofTranslate(ofGetCenter());
-        ofSetColor(255);
-        lClip.drawRandom(lClipFbos,ofPoint(400,0));
-        rClip.drawRandom(rClipFbos,ofPoint(-400,0));
-        ofPopStyle();
-        ofPopMatrix();
-        lrClipFbo.end();
-    }
+//    if(lsTemp.bUpdate){
+//        tempFbo.begin();
+//        ofClear(255);
+//        temp.update();
+//        ofSetColor(255,0,0);
+//        temp.draw();
+//        tempFbo.end();
+//    }
+    temp.update();
+
+    centerClip.updateCenterClip();
+    lrClip.updateLRClip();
+//    if(lsCenterClip.bUpdate){
+//        centerClipFbo.begin();
+//        ofPushMatrix();
+//        ofPushStyle();
+//        ofClear(255);
+//        ofTranslate(ofGetCenter());
+//        ofSetColor(255);
+//        if("anatomy"==centerClip.clipFolder) centerClip.drawRandom(anatomyFbos);
+//        if("lady"==centerClip.clipFolder) centerClip.drawRandom(ladyFbos);
+//        if("flower"==centerClip.clipFolder) centerClip.drawRandom(flowerFbos);
+//        if("butterfly"==centerClip.clipFolder) centerClip.drawRandom(butterflyFbos);
+//        if("fig"==centerClip.clipFolder) centerClip.drawRandom(figFbos);
+//        ofPopStyle();
+//        ofPopMatrix();
+//        centerClipFbo.end();
+//    }
+//    if(lsLRClip.bUpdate){
+//        lrClipFbo.begin();
+//        ofPushMatrix();
+//        ofPushStyle();
+//        ofClear(255);
+//        ofTranslate(ofGetCenter());
+//        ofSetColor(255);
+//        lClip.drawRandom(lClipFbos,ofPoint(400,0));
+//        rClip.drawRandom(rClipFbos,ofPoint(-400,0));
+//        ofPopStyle();
+//        ofPopMatrix();
+//        lrClipFbo.end();
+//    }
     if(lsCrossRects.bUpdate){
         cRFbo.begin();
         ofPushStyle();
@@ -177,13 +191,13 @@ void ofApp::update(){
         {
             ofClear(255); // blackBG
             //--- UNDER_MASK ---//
-            if (lsTemp.bDraw[i]) {
-                ofSetColor(255,lsTemp.alpha);
-                tempFbo.draw(0,0);
+            if (temp.getLS().bDraw[i]) {
+                ofSetColor(255,temp.getLS().alpha);
+                temp.render();
             }
-            if(lsCenterClip.bDraw[i]){
-                ofSetColor(255,lsCenterClip.alpha);
-                centerClipFbo.draw(0,0);
+            if(centerClip.getLS().bDraw[i]){
+                ofSetColor(255,centerClip.getLS().alpha);
+                centerClip.render();
             }
             if(lsCrossRects.bDraw[i]){
                 ofSetColor(255, lsCrossRects.alpha);
@@ -193,9 +207,9 @@ void ofApp::update(){
                 ofSetColor(255, lsFlower.alpha);
                 flowerFbo.draw(0,0);
             }
-            if(lsLRClip.bDraw[i]){
-                ofSetColor(255, lsLRClip.alpha);
-                lrClipFbo.draw(0,0);
+            if(lrClip.getLS().bDraw[i]){
+                ofSetColor(255, lrClip.getLS().alpha);
+                lrClip.render();
             }
         }
         preFbo[i].end();
@@ -228,32 +242,32 @@ void ofApp::update(){
         ofClear(0,255);
         //--- BG draw ---//
         if(lsFlower.bBG) flowerFbo.draw(0,0);
-        if(lsCenterClip.bBG) centerClipFbo.draw(0,0);
+        if(centerClip.getLS().bBG) centerClip.render();
         if(lsCrossRects.bBG) cRFbo.draw(0,0);
-        if(lsTemp.bBG) tempFbo.draw(0,0);
-        if(lsLRClip.bBG) lrClipFbo.draw(0,0);
+        if(temp.getLS().bBG) temp.render();
+        if(lrClip.getLS().bBG) lrClip.render();
 
         glitchFbo.draw(0,0);
 
         //--- ON draw ---//
         if(lsFlower.bON) flowerFbo.draw(0,0);
-        if(lsCenterClip.bON) centerClipFbo.draw(0,0);
+        if(centerClip.getLS().bON) centerClip.render();
         if(lsCrossRects.bON) cRFbo.draw(0,0);
-        if(lsTemp.bON) tempFbo.draw(0,0);
-        if(lsLRClip.bON) lrClipFbo.draw(0,0);
+        if(temp.getLS().bON) temp.render();
+        if(lrClip.getLS().bON) lrClip.render();
 
     }
     finalFbo.end();
 
 }
 //--------------------------------------------------------------
-void ofApp::draw(){
+void vjGokko::draw(){
     ofColor color;
     color.setHsb(ofMap(ofGetFrameRate(), 0, 60, 0, 20,true)*5, 255, 255, 255);
     fpsMonitor->setColorFill(color);
 }
 //--------------------------------------------------------------
-void ofApp::drawOutput(ofEventArgs &args){
+void vjGokko::drawOutput(ofEventArgs &args){
     ofPushStyle();
     ofEnableBlendMode(OF_BLENDMODE_ALPHA);
     finalFbo.draw(0,0);
@@ -261,27 +275,29 @@ void ofApp::drawOutput(ofEventArgs &args){
 }
 
 //--------------------------------------------------------------
-void ofApp::exit(){
+void vjGokko::exit(){
     MONITOR->saveSettings("settings/UI.xml");
-    tempUI->saveSettings("settings/templateUI.xml");
-    centerClipUI->saveSettings("settings/centerClipUI.xml");
+    temp.getUI()->saveSettings("settings/templateUI.xml");
+
+    centerClip.getUI()->saveSettings("settings/centerClipUI.xml");
     crossRectsUI->saveSettings("settings/crossRectsUI.xml");
     flowerUI->saveSettings("settings/flowerUI.xml");
-    lrClipUI->saveSettings("settings/lrClipUI.xml");
+    lrClip.getUI()->saveSettings("settings/lrClipUI.xml");
     delete MONITOR;
-    delete tempUI;
-    delete centerClipUI;
+//    delete tempUI;
+    delete temp.getUI();
+    delete centerClip.getUI();
     delete crossRectsUI;
     delete flowerUI;
-    delete lrClipUI;
+    delete lrClip.getUI();
 }
 //--------------------------------------------------------------
-void ofApp::exitOutput(ofEventArgs &args){
+void vjGokko::exitOutput(ofEventArgs &args){
     std::exit(0);
 }
 
 //--------------------------------------------------------------
-void ofApp::guiEvent(ofxUIEventArgs &e)
+void vjGokko::guiEvent(ofxUIEventArgs &e)
 {
     string name = e.getName();
     int kind = e.widget->getKind();
@@ -297,7 +313,8 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
         vector<ofxUIWidget *> &selected = ddlist->getSelected();
         for(int i = 0; i < selected.size(); i++){
             cout << "SELECTED: ("<<i<<") " << selected[i]->getName() << endl;
-            centerClip.clipFolder = selected[i]->getName();
+            //centerClip.clipFolder = selected[i]->getName();
+            centerClip.setClip(clips[selected[i]->getName()]);
         }
     }else if(name == "FillFlower"){
         flower.bRadiation =false;
@@ -305,16 +322,16 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
          flower.bFill =false;
     }
     if(name == "LR_Scale"){
-        rClip.scale=lClip.scale;
+        //lrClip.scale=lClip.scale;
     }else if(name == "LR_Speed"){
-        rClip.speed=lClip.speed;
+        //lrClip.speed=lClip.speed;
     }
     
 }
 //--------------------------------------------------------------
 //--------------------------------------------------------------
 //--------------------------------------------------------------
-void ofApp::setupUI(){
+void vjGokko::setupUI(){
     ofBackground(0);
 //    themeNum = ofRandom(45);
     themeNum=43;
@@ -323,18 +340,28 @@ void ofApp::setupUI(){
     setPreUI();
     setMonitorUI();
 
+    temp.setUI();
+    ofAddListener(temp.getUI()->newGUIEvent, this, &vjGokko::guiEvent);
+
+    centerClip.setCenterClipUI(aIFolderNames);
+    lrClip.setLRClipUI();
+    ofAddListener(centerClip.getUI()->newGUIEvent, this, &vjGokko::guiEvent);
+    ofAddListener(lrClip.getUI()->newGUIEvent, this, &vjGokko::guiEvent);
+
+
     //--- setup layer UI ---//
-    setTempUI();
-    setCenterClipUI();
+    //setTempUI();
+//    setCenterClipUI();
+//    setLRClipUI();
     setCrossRectsUI();
     setFlowerUI();
-    setLRClipUI();
+
     cout<<" - setupUI - "<<endl;
 }
 
 //--------------------------------------------------------------
-void ofApp::setTitleUI(){
-    TITLE = new ofxUISuperCanvas(" vjTool - version0.1 ",OFX_UI_FONT_LARGE);
+void vjGokko::setTitleUI(){
+    TITLE = new ofxUISuperCanvas(" vjGokko - version0.1 ",OFX_UI_FONT_LARGE);
     TITLE->setTheme(themeNum);
     TITLE->setPosition(1, 1);
     TITLE->setDrawPadding(false);
@@ -355,7 +382,7 @@ void ofApp::setTitleUI(){
     TITLE->autoSizeToFitWidgets();
 }
 //--------------------------------------------------------------
-void ofApp::setPreUI(){
+void vjGokko::setPreUI(){
     int w = 300;
     preUI.resize(PRE_SIZE);
     preFbo.resize(PRE_SIZE);
@@ -374,7 +401,7 @@ void ofApp::setPreUI(){
     }
 }
 //--------------------------------------------------------------
-void ofApp::setMonitorUI(){
+void vjGokko::setMonitorUI(){
     int w=500;
     int h=w/16*9;
     MONITOR = new ofxUISuperCanvas("finalMonitor");
@@ -387,7 +414,7 @@ void ofApp::setMonitorUI(){
     MONITOR->autoSizeToFitWidgets();
 }
 //--------------------------------------------------------------
-inline void ofApp::setLayerUI(ofxUISuperCanvas *ui, ofFbo &fbo, layerSettings &ls){
+inline void vjGokko::setLayerUI(ofxUISuperCanvas *ui, ofFbo &fbo, layerSettings &ls){
     ui->setTheme(themeNum);
     int w = 200;
     //ui->setColorBack(ofColor(222,22));
@@ -411,47 +438,46 @@ inline void ofApp::setLayerUI(ofxUISuperCanvas *ui, ofFbo &fbo, layerSettings &l
     ui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     ui->addSlider("alpha", 0, 255, &ls.alpha)->setColorBack(ofColor::darkRed);
     ui->addSpacer();
-//    ui->setParent(allLayer);
 }
 
+////--------------------------------------------------------------
+//void vjGokko::setTempUI(){
+//    tempUI = new ofxUISuperCanvas("template");
+//    setLayerUI(tempUI, tempFbo, lsTemp);
+//
+////    tempUI->addSlider("Scale", 0, 30, &temp.scale);
+////    tempUI->addSlider("Speed", 0, 15, &temp.speed);
+////    tempUI->addSlider("Offset", 0, 100, &temp.offset);
+//
+//    tempUI->autoSizeToFitWidgets();
+//    ofAddListener(tempUI->newGUIEvent, this, &vjGokko::guiEvent);
+//}
+////--------------------------------------------------------------
+//void vjGokko::setCenterClipUI(){
+//    centerClipUI = new ofxUISuperCanvas("AntiqueImages");
+//    setLayerUI(centerClipUI, centerClipFbo, lsCenterClip);
+//
+//    centerClipUI->addSlider("Sclae", 1, 3, &centerClip.scale);
+//    centerClipUI->addIntSlider("Speed", 1, 30, &centerClip.speed);
+//    ofxUIDropDownList *ddl = (ofxUIDropDownList *)centerClipUI->addDropDownList("antiqueFolder", aIFolderNames);
+//    ddl->setSingleSelected(1);
+//    ddl->setAutoClose(true);
+//    ddl->setShowCurrentSelected(true);
+//    centerClipUI->autoSizeToFitWidgets();
+//    ofAddListener(centerClipUI->newGUIEvent, this, &vjGokko::guiEvent);
+//}
+////--------------------------------------------------------------
+//void vjGokko::setLRClipUI(){
+//    lrClipUI = new ofxUISuperCanvas("LR clip");
+//    setLayerUI(lrClipUI, lrClipFbo, lsLRClip);
+//
+//    lrClipUI->addSlider("LR_Scale", 1, 3, &lClip.scale);
+//    lrClipUI->addIntSlider("LR_Speed", 1, 30, &lClip.speed);
+//    lrClipUI->autoSizeToFitWidgets();
+//    ofAddListener(lrClipUI->newGUIEvent, this, &vjGokko::guiEvent);
+//}
 //--------------------------------------------------------------
-void ofApp::setTempUI(){
-    tempUI = new ofxUISuperCanvas("template");
-    setLayerUI(tempUI, tempFbo, lsTemp);
-
-    tempUI->addSlider("Scale", 0, 30, &temp.scale);
-    tempUI->addSlider("Speed", 0, 15, &temp.speed);
-    tempUI->addSlider("Offset", 0, 100, &temp.offset);
-
-    tempUI->autoSizeToFitWidgets();
-    ofAddListener(tempUI->newGUIEvent, this, &ofApp::guiEvent);
-}
-//--------------------------------------------------------------
-void ofApp::setCenterClipUI(){
-    centerClipUI = new ofxUISuperCanvas("AntiqueImages");
-    setLayerUI(centerClipUI, centerClipFbo, lsCenterClip);
-
-    centerClipUI->addSlider("Sclae", 1, 3, &centerClip.scale);
-    centerClipUI->addIntSlider("Speed", 1, 30, &centerClip.speed);
-    ofxUIDropDownList *ddl = (ofxUIDropDownList *)centerClipUI->addDropDownList("antiqueFolder", aIFolderNames);
-    ddl->setSingleSelected(1);
-    ddl->setAutoClose(true);
-    ddl->setShowCurrentSelected(true);
-    centerClipUI->autoSizeToFitWidgets();
-    ofAddListener(centerClipUI->newGUIEvent, this, &ofApp::guiEvent);
-}
-//--------------------------------------------------------------
-void ofApp::setLRClipUI(){
-    lrClipUI = new ofxUISuperCanvas("LR clip");
-    setLayerUI(lrClipUI, lrClipFbo, lsLRClip);
-
-    lrClipUI->addSlider("LR_Scale", 1, 3, &lClip.scale);
-    lrClipUI->addIntSlider("LR_Speed", 1, 30, &lClip.speed);
-    lrClipUI->autoSizeToFitWidgets();
-    ofAddListener(lrClipUI->newGUIEvent, this, &ofApp::guiEvent);
-}
-//--------------------------------------------------------------
-void ofApp::setCrossRectsUI(){
+void vjGokko::setCrossRectsUI(){
     crossRectsUI = new ofxUISuperCanvas("crossRects");
     setLayerUI(crossRectsUI, cRFbo, lsCrossRects);
 
@@ -459,10 +485,10 @@ void ofApp::setCrossRectsUI(){
     crossRectsUI->addRangeSlider("rectSpeed", 1, 100, &cRects.minSpeed, &cRects.maxSpeed);
     crossRectsUI->addRangeSlider("rectScale", 0, 3, &cRects.minScale, &cRects.maxScale);
     crossRectsUI->autoSizeToFitWidgets();
-    ofAddListener(crossRectsUI->newGUIEvent, this, &ofApp::guiEvent);
+    ofAddListener(crossRectsUI->newGUIEvent, this, &vjGokko::guiEvent);
 }
 //--------------------------------------------------------------
-void ofApp::setFlowerUI(){
+void vjGokko::setFlowerUI(){
     flowerUI = new ofxUISuperCanvas("flower");
     setLayerUI(flowerUI, flowerFbo, lsFlower);
 
@@ -479,18 +505,19 @@ void ofApp::setFlowerUI(){
     flowerUI->addToggle("Curve", &flower.bCurve);
     flowerUI->addIntSlider("Kaleido", 1, 5, &flower.kaleidoNum);
     flowerUI->autoSizeToFitWidgets();
-    ofAddListener(flowerUI->newGUIEvent, this, &ofApp::guiEvent);
+    ofAddListener(flowerUI->newGUIEvent, this, &vjGokko::guiEvent);
 
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(ofKeyEventArgs &key){
+void vjGokko::keyPressed(ofKeyEventArgs &key){
     switch (key.key) {
         case OF_KEY_RETURN:{
             crossRectsUI->toggleVisible();
-            centerClipUI->toggleVisible();
-            tempUI->toggleVisible();
-            lrClipUI->toggleVisible();
+            centerClip.getUI()->toggleVisible();
+//            tempUI->toggleVisible();
+            temp.getUI()->toggleVisible();
+            lrClip.getUI()->toggleVisible();
             flowerUI->toggleVisible();
             preUI[0]->toggleVisible();
             preUI[1]->toggleVisible();
@@ -521,7 +548,7 @@ void ofApp::keyPressed(ofKeyEventArgs &key){
 
 }
 //--------------------------------------------------------------
-void ofApp::keyReleased(ofKeyEventArgs &key){
+void vjGokko::keyReleased(ofKeyEventArgs &key){
     switch (key.key) {
             //--- PostGlitch --//
         case '1':postGlitch.setFx(OFXPOSTGLITCH_CONVERGENCE    , false);break;

@@ -1,6 +1,6 @@
 //
 //  crossRects.h
-//  vjTool
+//  vjGokko
 //
 //  Created by shugohirao on 2018/04/08.
 //

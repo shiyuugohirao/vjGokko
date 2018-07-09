@@ -1,6 +1,6 @@
 //
 //  fftFlower.h
-//  vjTool
+//  vjGokko
 //
 //  Created by shugohirao on 2018/04/09.
 //

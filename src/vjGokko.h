@@ -5,30 +5,16 @@
 #include "ofxPSBlend.h"
 #include "ofxPostGlitch.h"
 
+#include "vjgHeader.h"
+
 #include "TEMPLATE.h"
 #include "crossRects.h"
 #include "fftFlower.h"
 #include "randomClip.h"
 
 
-#define PRE_SIZE 3
 
-enum ANCHOR{
-    CENTER,
-    TOPLEFT,
-};
-
-struct layerSettings{
-    bool bUpdate = true;
-    bool bON = false;
-    bool bBG = false;
-    bool bDraw[PRE_SIZE] = {0,0,0};
-    bool bPSBlend = false;
-    float alpha = 255; //0~255
-};
-
-
-class ofApp : public ofBaseApp{
+class vjGokko : public ofBaseApp{
 public:
     //=================================//
     //========== Output window ========//
@@ -84,13 +70,14 @@ public:
     
     //--- antiqueImages ---//
     vector<string> aIFolderNames = {"anatomy","lady","flower","butterfly","fig","rFace","lFace"};
+    unordered_map<string, vector<ofFbo> > clips;
     vector<ofFbo> anatomyFbos;
     vector<ofFbo> ladyFbos;
     vector<ofFbo> flowerFbos;
     vector<ofFbo> butterflyFbos;
     vector<ofFbo> figFbos;
-    vector<ofFbo> rClipFbos;
-    vector<ofFbo> lClipFbos;
+//    vector<ofFbo> rClipFbos;
+//    vector<ofFbo> lClipFbos;
 
 
     //===============================================//
@@ -100,37 +87,37 @@ public:
     crossRects cRects;
     fftFlower flower;
     randomClip centerClip;
-    randomClip lClip, rClip;
+    randomClip lrClip;//rClip;
 
     //--- Fbo
-    ofFbo tempFbo;
-    ofFbo centerClipFbo;
-    ofFbo lrClipFbo;
+//    ofFbo tempFbo;
+//    ofFbo centerClipFbo;
+//    ofFbo lrClipFbo;
     ofFbo cRFbo;
     ofFbo flowerFbo;
 
     //--- layerSettings
-    layerSettings lsTemp;
+//    layerSettings lsTemp;
     layerSettings lsCrossRects;
-    layerSettings lsCenterClip;
-    layerSettings lsLRClip;
+//    layerSettings lsCenterClip;
+//    layerSettings lsLRClip;
     layerSettings lsFlower;
 
     //--- UI
-    ofxUISuperCanvas *allLayer;
-    ofxUISuperCanvas *tempUI;
-    ofxUISuperCanvas *centerClipUI;
-    ofxUISuperCanvas *lrClipUI;
+//    ofxUISuperCanvas *tempUI;
+//    ofxUISuperCanvas *centerClipUI;
+//    ofxUISuperCanvas *lrClipUI;
     ofxUISuperCanvas *crossRectsUI;
     ofxUISuperCanvas *flowerUI;
     ofxUISuperCanvas *moyaFontUI;
 
     inline void setLayerUI(ofxUISuperCanvas *ui, ofFbo &fbo, layerSettings &ls);
-    void setTempUI();
-    void setCenterClipUI();
+//    void setTempUI();
+//    void setCenterClipUI();
+//    void setLRClipUI();
     void setCrossRectsUI();
     void setFlowerUI();
-    void setLRClipUI();
+
 
     //----------------------//
     //--- generalMethods ---//

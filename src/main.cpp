@@ -1,5 +1,5 @@
 #include "ofMain.h"
-#include "ofApp.h"
+#include "vjGokko.h"
 
 //========================================================================
 int main( ){
@@ -23,9 +23,9 @@ int main( ){
     shared_ptr<ofAppBaseWindow> outputWindow = ofCreateWindow(settings);
 
 
-    shared_ptr<ofApp> mainApp(new ofApp);
-    ofAddListener(outputWindow->events().draw,mainApp.get(),&ofApp::drawOutput);
-    ofAddListener(guiWindow->events().exit,mainApp.get(),&ofApp::exitOutput);
+    shared_ptr<vjGokko> mainApp(new vjGokko);
+    ofAddListener(outputWindow->events().draw,mainApp.get(),&vjGokko::drawOutput);
+    ofAddListener(guiWindow->events().exit,mainApp.get(),&vjGokko::exitOutput);
     mainApp->setupOutput();
     ofRunApp(guiWindow, mainApp);
     ofRunMainLoop();
