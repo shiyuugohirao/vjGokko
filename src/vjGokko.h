@@ -6,13 +6,11 @@
 #include "ofxPostGlitch.h"
 
 #include "vjgHeader.h"
-
 #include "TEMPLATE.h"
 #include "crossRects.h"
 #include "fftFlower.h"
 #include "randomClip.h"
-
-
+#include "videoPlayer.h"
 
 class vjGokko : public ofBaseApp{
 public:
@@ -23,7 +21,7 @@ public:
     void drawOutput(ofEventArgs &args);
     void exitOutput(ofEventArgs &args);
 
-    float mainW,mainH;
+//    float mainW,mainH;
     bool blackBg = false;
     float preAlpha[PRE_SIZE]={255,255,255};
     bool bBlend[PRE_SIZE]={1,0,0};
@@ -70,15 +68,10 @@ public:
     
     //--- antiqueImages ---//
     vector<string> aIFolderNames = {"anatomy","lady","flower","butterfly","fig","rFace","lFace"};
-    unordered_map<string, vector<ofFbo> > clips;
-    vector<ofFbo> anatomyFbos;
-    vector<ofFbo> ladyFbos;
-    vector<ofFbo> flowerFbos;
-    vector<ofFbo> butterflyFbos;
-    vector<ofFbo> figFbos;
-//    vector<ofFbo> rClipFbos;
-//    vector<ofFbo> lClipFbos;
+    unordered_map<string, vector<ofFbo> > antiqueFbos;
 
+    vector<string> videoNames = {"nostalgy01.mp4","sunshine.mp4","hokori.mp4"};
+    unordered_map<string, ofVideoPlayer > videos;
 
     //===============================================//
     //============== LAYERS SETTINGS ================//
@@ -87,66 +80,69 @@ public:
     crossRects cRects;
     fftFlower flower;
     randomClip centerClip;
-    randomClip lrClip;//rClip;
+    randomClip lClip, rClip;
+
+    videoPlayer vPlayer;
 
     //--- Fbo
-//    ofFbo tempFbo;
-//    ofFbo centerClipFbo;
-//    ofFbo lrClipFbo;
+    ofFbo tempFbo;
+    ofFbo centerClipFbo;
+    ofFbo lrClipFbo;
     ofFbo cRFbo;
     ofFbo flowerFbo;
+    ofFbo videoFbo;
 
     //--- layerSettings
-//    layerSettings lsTemp;
+    layerSettings lsTemp;
     layerSettings lsCrossRects;
-//    layerSettings lsCenterClip;
-//    layerSettings lsLRClip;
+    layerSettings lsCenterClip;
+    layerSettings lsLRClip;
     layerSettings lsFlower;
+    layerSettings lsVideo;
 
     //--- UI
-//    ofxUISuperCanvas *tempUI;
-//    ofxUISuperCanvas *centerClipUI;
-//    ofxUISuperCanvas *lrClipUI;
+    ofxUISuperCanvas *allLayer;
+    ofxUISuperCanvas *tempUI;
+    ofxUISuperCanvas *centerClipUI;
+    ofxUISuperCanvas *lrClipUI;
     ofxUISuperCanvas *crossRectsUI;
     ofxUISuperCanvas *flowerUI;
-    ofxUISuperCanvas *moyaFontUI;
+    ofxUISuperCanvas *videoUI;
 
     inline void setLayerUI(ofxUISuperCanvas *ui, ofFbo &fbo, layerSettings &ls);
-//    void setTempUI();
-//    void setCenterClipUI();
-//    void setLRClipUI();
+    void setTempUI();
+    void setCenterClipUI();
     void setCrossRectsUI();
     void setFlowerUI();
+    void setLRClipUI();
+    void setVideoUI();
 
-
-    //----------------------//
-    //--- generalMethods ---//
-    //----------------------//
-    ofPoint ofGetCenter(){
-        return ofPoint((float)mainW/2,(float)mainH/2);
-    }
-    void initFbo(ofFbo &fbo , ANCHOR anc=TOPLEFT){
-        fbo.allocate(mainW,mainH);
-        fbo.begin();
-        ofClear(255);
-        fbo.end();
-        if(anc==CENTER){
-            fbo.setAnchorPercent(0.5,0.5);
-        }else if(anc==TOPLEFT){
-            fbo.setAnchorPercent(0,0);
-        }
-    }
-
-    void setImageFbo(ofFbo &fbo, ofImage img, ANCHOR anc=CENTER){
-        fbo.allocate(img.getWidth(), img.getHeight());
-        fbo.begin();
-        ofClear(255);
-        img.draw(0,0);
-        fbo.end();
-        if(anc==CENTER){
-            fbo.setAnchorPercent(0.5,0.5);
-        }else if(anc==TOPLEFT){
-            fbo.setAnchorPercent(0,0);
-        }
-    }
+//    //----------------------//
+//    //--- generalMethods ---//
+//    //----------------------//
+//
+//    void initFbo(ofFbo &fbo , ANCHOR anc=TOPLEFT){
+//        fbo.allocate(WIDTH,HEIGHT);
+//        fbo.begin();
+//        ofClear(255);
+//        fbo.end();
+//        if(anc==CENTER){
+//            fbo.setAnchorPercent(0.5,0.5);
+//        }else if(anc==TOPLEFT){
+//            fbo.setAnchorPercent(0,0);
+//        }
+//    }
+//
+//    void setImageFbo(ofFbo &fbo, ofImage img, ANCHOR anc=CENTER){
+//        fbo.allocate(img.getWidth(), img.getHeight());
+//        fbo.begin();
+//        ofClear(255);
+//        img.draw(0,0);
+//        fbo.end();
+//        if(anc==CENTER){
+//            fbo.setAnchorPercent(0.5,0.5);
+//        }else if(anc==TOPLEFT){
+//            fbo.setAnchorPercent(0,0);
+//        }
+//    }
 };

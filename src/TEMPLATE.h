@@ -6,29 +6,19 @@
 //  Created by shugohirao on 2018/04/14.
 //
 #pragma once
-//#include "ofMain.h"
-#include "vjgHeader.h"
 
 class TEMPLATE {
-private:
-//    ofPtr<ofxUISuperCanvas> UI;
-    ofxUISuperCanvas *UI;
-    ofFbo fbo;
-    layerSettings ls;
-
+public:
     ofPoint pos;
     float scale;
     float speed;
-    float offset;
-    float cycle;
     float r;
     float deg;
+    float offset;
+    float cycle;
     bool bRandomRes = true;
 
-protected:
 
-
-public:
     TEMPLATE(){}
     ~TEMPLATE(){}
 
@@ -37,8 +27,6 @@ public:
         r = _r;
         offset = 1.0;
         deg=0;
-
-        vjgTool::initFbo(fbo);
     }
     void setParams(float _scale, float _speed, float _offset){
         scale = _scale;
@@ -49,15 +37,7 @@ public:
 
     void update(){
         cycle = 1/(speed/10);
-        r = (offset+sin(ofGetElapsedTimef()*TWO_PI/cycle))*scale;
-
-        if(ls.bUpdate){
-            fbo.begin();
-            ofClear(255);
-            ofSetColor(255,0,0);
-            draw();
-            fbo.end();
-        }
+       r = (offset+sin(ofGetElapsedTimef()*TWO_PI/cycle))*scale;
     }
 
     void draw(){
@@ -84,24 +64,5 @@ public:
         ofPopMatrix();
     }
 
-    void render(){
-        fbo.draw(0,0);
-    }
-
-    
-    void setUI(){
-        UI = new ofxUISuperCanvas("template");
-        vjgTool::setLayerUI(UI, fbo, ls);
-
-        UI->addSlider("Scale", 0, 30, &scale);
-        UI->addSlider("Speed", 0, 15, &speed);
-        UI->addSlider("Offset", 0, 100, &offset);
-
-        UI->autoSizeToFitWidgets();
-//        ofAddListener(UI->newGUIEvent, this, &vjGokko::guiEvent);
-    }
-
-    ofxUISuperCanvas* getUI(){ return UI; }
-    layerSettings getLS(){ return ls; }
 
 };

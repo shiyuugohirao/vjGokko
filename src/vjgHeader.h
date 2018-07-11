@@ -5,32 +5,30 @@
 //  Created by shugohirao on 2018/07/09.
 //
 
+//#define NO_LOAD_XML
+
 #pragma once
 #include "ofxUI.h"
 
-const int WIDTH = 1280; //ofGetWidth();
-const int HEIGHT = 720; //ofGetHeight();
-const int sWIDTH = 1920; //ofGetScreenWidth();
-const int sHEIGHT = 1080; //ofGetScreenHeight();
+const int uiWIDTH = 1280; //ofGetWidth();
+const int uiHEIGHT = 720; //ofGetHeight();
+const int WIDTH = 1920; //ofGetScreenWidth();
+const int HEIGHT = 1080; //ofGetScreenHeight();
 
 const int PRE_SIZE = 3;
 const int themeNum = 43; //ofRandom(45);
 
 static unordered_map<string, ofColor> vjgColor = {
-    {"RED",    ofColor(255,90,118)},
-    {"PINK",   ofColor(255,145,225)},
-    {"ORANGE", ofColor(255,165,37)},
-    {"YELLOW", ofColor(255,253,66)},
-    {"PURPLE", ofColor(167,114,255)},
     {"BLUE",   ofColor(34,242,255)},
+    {"WATER",   ofColor(220,242,255)},
+    {"SKY",   ofColor(135,185,255)},
+    {"ICE",   ofColor(200,220,255)},
 };
 const string COLOR[] ={
-    "RED",
-    "PINK",
-    "ORANGE",
-    "YELLOW",
-    "PURPLE",
     "BLUE",
+    "WATER",
+    "SKY",
+    "ICE",
 };
 
 enum ANCHOR{
@@ -77,7 +75,7 @@ public:
     }
 
     static void initFbo(ofFbo &fbo , ANCHOR anc=TOPLEFT){
-        fbo.allocate(sWIDTH,sHEIGHT);
+        fbo.allocate(WIDTH, HEIGHT);
         fbo.begin();
         ofClear(255);
         fbo.end();
@@ -88,12 +86,8 @@ public:
         }
     }
 
-    static ofPoint ofGetCenter(){
-        return ofPoint((float)WIDTH/2,(float)HEIGHT/2);
-    }
-    static ofPoint ofGetScreenCenter(){
-        return ofPoint((float)sWIDTH/2,(float)sHEIGHT/2);
-    }
+    static ofPoint ofGetCenter(){ return ofPoint(WIDTH/2,HEIGHT/2); }
+    static ofPoint ofGetUICenter(){ return ofPoint(uiWIDTH/2,uiHEIGHT/2); }
 
     static void setImageFbo(ofFbo &fbo, ofImage img, ANCHOR anc=CENTER){
         fbo.allocate(img.getWidth(), img.getHeight());
