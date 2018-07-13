@@ -31,6 +31,8 @@ void vjGokko::setupOutput(){
     vPlayer.videoName = "nostalgy01.mp4";
     temp.setup(ofVec2f(WIDTH/2, HEIGHT/2));
     flower.setupFft(1024);
+
+    outputAlpha = 255;
 }
 //--------------------------------------------------------------
 void vjGokko::setup(){
@@ -267,6 +269,7 @@ void vjGokko::draw(){
 void vjGokko::drawOutput(ofEventArgs &args){
     ofPushStyle();
     ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    ofSetColor(255,outputAlpha);
     finalFbo.draw(0,0);
     ofPopStyle();
 }
@@ -379,7 +382,7 @@ void vjGokko::setTitleUI(){
 }
 //--------------------------------------------------------------
 void vjGokko::setPreUI(){
-    int w = 300;
+    int w = 250;
     preUI.resize(PRE_SIZE);
     preFbo.resize(PRE_SIZE);
     for(int i=0;i<preUI.size();i++){
@@ -398,21 +401,22 @@ void vjGokko::setPreUI(){
 }
 //--------------------------------------------------------------
 void vjGokko::setMonitorUI(){
-    int w=500;
+    int w=300;
     int h=w/16*9;
     MONITOR = new ofxUISuperCanvas("finalMonitor");
     MONITOR->setTheme(themeNum);
-    MONITOR->setPosition(0, h);
+    MONITOR->setPosition(300, h);
     MONITOR->setWidth(w);
     MONITOR->setHeight(h);
     MONITOR->setDrawOutlineHighLight(true);
+    MONITOR->addSlider("alpha", 0, 255, &outputAlpha)->setColorBack(ofColor::ghostWhite);
     MONITOR->addBaseDraws("Monitor", &finalFbo,w,h);
     MONITOR->autoSizeToFitWidgets();
 }
 //--------------------------------------------------------------
 inline void vjGokko::setLayerUI(ofxUISuperCanvas *ui, ofFbo &fbo, layerSettings &ls){
     ui->setTheme(themeNum);
-    int w = 200;
+    int w = 180;
     //ui->setColorBack(ofColor(222,22));
     ui->setDrawOutline(true);
     ui->setWidth(w);
@@ -493,7 +497,7 @@ void vjGokko::setFlowerUI(){
     flowerUI->addSlider("Ratio",0,50000,&flower.ratio);
     flowerUI->addSlider("Offset", 0, 1000, &flower.offset);
     flowerUI->addIntSlider("Interval", 10, 100, &flower.interval);
-    flowerUI->addSlider("LineWidth", 1, 30, &flower.lineWidth);
+    flowerUI->addSlider("LineWidth", 1, 10, &flower.lineWidth);
     flowerUI->addToggle("Rotate", &flower.bRotate);
     flowerUI->addToggle("FillFlower", &flower.bFill);
     flowerUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
@@ -510,11 +514,11 @@ void vjGokko::setVideoUI(){
     videoUI = new ofxUISuperCanvas("videoPlayer");
     setLayerUI(videoUI, videoFbo, lsVideo);
 
+    videoUI->addSlider("videoSpeed", 1, 100, &vPlayer.speed);
     ofxUIDropDownList *ddl = (ofxUIDropDownList *)videoUI->addDropDownList("videoFile", videoNames);
     ddl->setSingleSelected(1);
     ddl->setAutoClose(true);
     ddl->setShowCurrentSelected(true);
-    videoUI->addSlider("videoSpeed", 1, 100, &vPlayer.speed);
     videoUI->autoSizeToFitWidgets();
     ofAddListener(videoUI->newGUIEvent, this, &vjGokko::guiEvent);
 }

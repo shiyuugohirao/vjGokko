@@ -36,6 +36,7 @@ public:
     ofFbo blendFbo;
     ofFbo glitchFbo;
     ofFbo finalFbo;
+    float outputAlpha;
 
 
     //=============================//
@@ -70,7 +71,7 @@ public:
     vector<string> aIFolderNames = {"anatomy","lady","flower","butterfly","fig","rFace","lFace"};
     unordered_map<string, vector<ofFbo> > antiqueFbos;
 
-    vector<string> videoNames = {"nostalgy01.mp4","sunshine.mp4","hokori.mp4"};
+    vector<string> videoNames = {"nostalgy01.mp4","sunshine.mp4","hokori.mp4","city.mp4"};
     unordered_map<string, ofVideoPlayer > videos;
 
     //===============================================//

@@ -41,15 +41,10 @@ public:
 
     void update(int maxX, int maxY){
         pos += dir*speed;
-        if(pos.x<-100){
-            pos=ofPoint(maxX+50,ofRandom(maxY));
-        }else if(pos.x>maxX+100){
-            pos=ofPoint(-50,ofRandom(maxY));
-        }else if(pos.y<-100){
-            pos=ofPoint(ofRandom(maxX),maxY+50);
-        }else if(pos.y>maxY+100){
-            pos=ofPoint(ofRandom(maxX),-50);
-        }
+        if(pos.x<-100){ pos=ofPoint(maxX+50,ofRandom(maxY));}
+        else if(pos.x>maxX+100){ pos=ofPoint(-50,ofRandom(maxY)); }
+        else if(pos.y<-100){ pos=ofPoint(ofRandom(maxX),maxY+50); }
+        else if(pos.y>maxY+100){ pos=ofPoint(ofRandom(maxX),-50); }
     }
     void draw(){
         ofPushStyle();
@@ -78,16 +73,11 @@ public:
     }
 
     void update(int maxX, int maxY){
-
-        for(auto &r:rects){
-            r.update(maxX,maxY);
-        }
+        for(auto &r:rects){ r.update(maxX,maxY); }
     }
 
     void draw(){
-        for(auto &r:rects){
-            r.draw();
-        }
+        for(auto &r:rects){ r.draw(); }
     }
 
     void setRandomSpeed(float min,float max){
@@ -113,11 +103,8 @@ public:
 
     void setRects(int n){
         int temp = rects.size();
-        if(n > temp){
-            addRects(n-temp);
-        }else if(n < temp){
-            deleteRects(temp-n);
-        }
+        if(n > temp){ addRects(n-temp); }
+        else if(n < temp){ deleteRects(temp-n); }
     }
 
     void addRects(int n=1){
@@ -128,7 +115,7 @@ public:
     }
     void deleteRects(int n=1){
         for(int i=0;i<n;i++){
-            if(fbos.size()<=0)return;
+            if(fbos.size()<=0){return;}
             rects.pop_back();
         }
     }

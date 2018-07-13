@@ -37,11 +37,6 @@ public:
         if(!video.isPlaying()){ video.play(); }
     }
 
-    void setParams(float _scale, float _speed, float _offset){
-        scale = _scale;
-        speed = _speed;
-    }
-
     void update(ofEventArgs &a){
         if(video.isPlaying()){ video.update(); }
     }
